@@ -1,9 +1,12 @@
 import { useState } from "react";
 import "./App.css";
-import { useListen, useSpeak } from "vox-sdk";
+import { useListen, useSpeak, useAppContext } from "vox-sdk";
 function App() {
+  const [text, setText] = useState("");
   const { answer, answers, loading, startSpeechRecognition, stopSpeechRecognition } = useListen({
-    automatedEnd: false,
+    onEndOfSpeech: () => {
+      setText(answers.join(""));
+    },
   });
   console.log(answers);
 
@@ -13,13 +16,16 @@ function App() {
     },
     shouldCallOnEnd: true,
     throttleDelay: 1000,
+    voice: "",
   });
-  const [text, setText] = useState("");
+
   // console.log(data);
 
   return (
     <>
-      <button onClick={startSpeechRecognition}>Start</button>
+      <button disabled={loading} onClick={startSpeechRecognition}>
+        Start
+      </button>
       <button onClick={stopSpeechRecognition}>End</button>
 
       <h1>Text to Speech with Azure AI</h1>
